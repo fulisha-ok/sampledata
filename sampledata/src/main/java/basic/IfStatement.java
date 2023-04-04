@@ -3,7 +3,7 @@ package basic;
 /**
  * @author： fulisha
  * @date： 2023/4/3 17:51
- * @description：
+ * @description： The usage of the if statement.
  */
 public class IfStatement {
     /**
@@ -44,9 +44,8 @@ public class IfStatement {
     }
 
     /**
-     * The absolute value of the given parameter.
      * @param paraValue The given value.
-     * @return
+     * @return  The absolute value of the given parameter.
      */
     public static int abs(int paraValue) {
         if (paraValue >= 0) {

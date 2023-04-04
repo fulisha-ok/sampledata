@@ -81,9 +81,8 @@ public class LeapYear {
     }
 
     /**
-     * Is the given year leap?
      * @param paraYear
-     * @return
+     * @return Is the given year leap? true or false;
      */
     public static boolean isLeapYear(int paraYear) {
         if ((paraYear % 4 == 0) && (paraYear % 100 != 0) || (paraYear % 400 == 0)) {
@@ -94,9 +93,8 @@ public class LeapYear {
     }
 
     /**
-     * Is the given year leap? Replace the complex condition with a number of if.
      * @param paraYear
-     * @return
+     * @return Is the given year leap? Replace the complex condition with a number of if. return true or false
      */
     public static boolean isLeapYearV2(int paraYear) {
         if (paraYear % 4 != 0) {
