@@ -1,9 +1,4 @@
 package datastructure.list;
-
-import sun.applet.Main;
-
-import java.util.UUID;
-
 /**
  * @Author: fulisha
  * @Date: 2023-04-05 17:34
