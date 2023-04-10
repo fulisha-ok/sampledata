@@ -226,6 +226,52 @@ public class BinaryCharTree {
 
     }
 
+    /**
+     * Covert the tree to data arrays, including a char array and an int array
+     * The results are stored in two member variables
+     */
+    public void toDataArraysObjectQueue(){
+        int tempLength = getNumNodes();
+
+        valuesArray = new char[tempLength];
+        indicesArray = new int[tempLength];
+        int i = 0;
+
+        CircleObjectQueue tempQueue = new CircleObjectQueue();
+        tempQueue.enqueue(this);
+        CircleObjectQueue tempIntQueue = new CircleObjectQueue();
+        Integer tempIndexInteger = 0;  // 自动装箱，等价于 Integer tempIndexInteger = Integer.valueOf(0);
+        tempIntQueue.enqueue(tempIndexInteger);
+
+        BinaryCharTree tempTree = (BinaryCharTree) tempQueue.dequeue();
+        int tempIndex = (int) tempIntQueue.dequeue();
+        System.out.println("tempIndex = " + tempIndex);
+        while (tempTree != null){
+            valuesArray[i] = tempTree.value;
+            indicesArray[i] = tempIndex;
+            i++;
+
+            if (tempTree.leftChild != null){
+                tempQueue.enqueue(tempTree.leftChild);
+                tempIntQueue.enqueue(Integer.valueOf(tempIndex * 2 + 1));
+            }
+
+            if (tempTree.rightChild != null) {
+                tempQueue.enqueue(tempTree.rightChild);
+                tempIntQueue.enqueue(Integer.valueOf(tempIndex * 2 + 2));
+            }
+
+            tempTree = (BinaryCharTree) tempQueue.dequeue();
+            if (tempTree == null) {
+                break;
+            }
+
+
+            tempIndex = (int) tempIntQueue.dequeue(); //等价于 ((Integer) tempIntQueue.dequeue()).intValue();
+        }
+
+    }
+
     public static void main(String args[]) {
         BinaryCharTree tempTree = manualConstructTree();
         System.out.println("\r\nPreorder visit:");
@@ -241,6 +287,11 @@ public class BinaryCharTree {
         System.out.println("The number of nodes is: " + tempTree.getNumNodes());
 
         tempTree.toDataArrays();
+        System.out.println("The values are: " + Arrays.toString(tempTree.valuesArray));
+        System.out.println("The indices are: " + Arrays.toString(tempTree.indicesArray));
+
+        tempTree.toDataArraysObjectQueue();
+        System.out.println("Only object queue.");
         System.out.println("The values are: " + Arrays.toString(tempTree.valuesArray));
         System.out.println("The indices are: " + Arrays.toString(tempTree.indicesArray));
     }
