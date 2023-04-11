@@ -3,6 +3,7 @@ package datastructure.tree;
 
 import com.sun.xml.internal.fastinfoset.util.ValueArray;
 import datastructure.queue.*;
+import datastructure.stack.ObjectStack;
 
 import java.util.Arrays;
 
@@ -180,6 +181,71 @@ public class BinaryCharTree {
         }
     }
 
+
+    /**
+     * In-order visit with stack.
+     */
+    public void inOrderVisitWithStack(){
+        ObjectStack tempStack = new ObjectStack();
+        BinaryCharTree tempNode = this;
+        while (!tempStack.isEmpty() || tempNode != null){
+            if (tempNode != null){
+                tempStack.push(tempNode);
+                tempNode = tempNode.leftChild;
+            } else {
+                tempNode = (BinaryCharTree)tempStack.pop();
+                System.out.print("" + tempNode.value + " ");
+                tempNode = tempNode.rightChild;
+            }
+        }
+    }
+
+    /**
+     * Pre-order visit with stack.
+     */
+    public void preOrderVisitWithStack() {
+        ObjectStack tempStack = new ObjectStack();
+        BinaryCharTree tempNode = this;
+        while (!tempStack.isEmpty() || tempNode != null) {
+            if (tempNode != null) {
+                System.out.print("" + tempNode.value + " ");
+                tempStack.push(tempNode);
+                tempNode = tempNode.leftChild;
+            } else {
+                tempNode = (BinaryCharTree) tempStack.pop();
+                tempNode = tempNode.rightChild;
+            }
+        }
+    }
+
+    /**
+     * Post-order visit with stack.
+     */
+    public void postOrderVisitWithStack() {
+        ObjectStack tempStack = new ObjectStack();
+        BinaryCharTree tempNode = this;
+        ObjectStack tempOutputStack = new ObjectStack();
+
+        while (!tempStack.isEmpty() || tempNode != null) {
+            if (tempNode != null) {
+                //Store for output.
+                tempOutputStack.push(new Character(tempNode.value));
+                tempStack.push(tempNode);
+                tempNode = tempNode.rightChild;
+            } else {
+                tempNode = (BinaryCharTree) tempStack.pop();
+                tempNode = tempNode.leftChild;
+            }
+        }
+
+        //Now reverse output.
+        while (!tempOutputStack.isEmpty()) {
+            System.out.print("" + tempOutputStack.pop() + " ");
+        }
+    }
+
+
+
     public int getDepth(){
         // It is a leaf.
         if ((leftChild == null) && (rightChild == null)) {
@@ -344,6 +410,13 @@ public class BinaryCharTree {
         tempTree2.inOrderVisit();
         System.out.println("\r\nPost-order visit:");
         tempTree2.postOrderVisit();
+
+        System.out.println("\r\nIn-order visit with stack:");
+        tempTree2.inOrderVisitWithStack();
+        System.out.println("\r\nPre-order visit with stack:");
+        tempTree2.preOrderVisitWithStack();
+        System.out.println("\r\nPost-order visit with stack:");
+        tempTree2.postOrderVisitWithStack();
     }
 
 
