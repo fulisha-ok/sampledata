@@ -1,5 +1,6 @@
 package graph;
 
+import datastructure.queue.CircleObjectQueue;
 import matrix.IntMatrix;
 
 /**
@@ -94,6 +95,88 @@ public class Graph {
 
     }
 
+    /**
+     * Breadth first Traversal
+     * @param paraStartIndex The start index.
+     * @return The sequence of the visit.
+     */
+    boolean[] tempVisitedArray;
+    String resultString = "";
+    public String breadthFirstTraversal(int paraStartIndex) {
+        CircleObjectQueue tempQueue = new CircleObjectQueue();
+        int tempNumNodes = connectivityMatrix.getRows();
+        tempVisitedArray = new boolean[tempNumNodes];
+
+        // Initialize the queue
+        tempVisitedArray[paraStartIndex] = true;
+        resultString += paraStartIndex;
+        tempQueue.enqueue(paraStartIndex);
+
+        //Now visit the rest of the graph.
+        int tempIndex;
+        Integer tempInteger = (Integer) tempQueue.dequeue();
+        while (tempInteger != null){
+            tempIndex = tempInteger.intValue();
+
+            //Enqueue all its unvisited neighbors.
+            for (int i = 0; i < tempNumNodes; i++){
+                if (tempVisitedArray[i]){
+                    // Already visited.
+                    continue;
+                }
+                if (connectivityMatrix.getData()[tempIndex][i] == 0) {
+                    //Not directly connected.
+                    continue;
+                }
+                tempVisitedArray[i] = true;
+                resultString += i;
+                tempQueue.enqueue(i);
+            }
+
+            //Take out one from the head.
+            tempInteger = (Integer)tempQueue.dequeue();
+        }
+        return resultString;
+    }
+
+    /**
+     * Judge connectivity
+     * @param
+     * @return
+     */
+    public boolean isConnectivity(int paraStartIndex){
+        int tempNumNodes = connectivityMatrix.getRows();
+        breadthFirstTraversal(paraStartIndex);
+
+        for (int i = 0; i < tempNumNodes; i++){
+            if (!tempVisitedArray[i]){
+                breadthFirstTraversal(i);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void breadthFirstTraversalTest() {
+        // Test an undirected graph.
+        //int[][] tempMatrix = { { 0, 1, 1, 0 }, { 1, 0, 0, 1 }, { 1, 0, 0, 1}, { 0, 1, 1, 0} };
+        //int[][] tempMatrix = { { 0, 1, 1, 0 , 0}, { 1, 0, 0, 1, 0 }, { 1, 0, 0, 1, 0}, { 0, 1, 1, 0, 0}, { 0, 0, 0, 0, 0} };
+        int[][] tempMatrix = { { 0, 1, 1, 0 , 0, 0, 0}, { 1, 0, 0, 1, 0, 0, 0 }, { 1, 0, 0, 1, 0, 0, 0}, { 0, 1, 1, 0, 0, 0, 0}, { 0, 0, 0, 0, 0, 1, 1}, { 0, 0, 0, 0, 1, 0, 0}, { 0, 0, 0, 0, 0, 0, 0} };
+        Graph tempGraph = new Graph(tempMatrix);
+        System.out.println(tempGraph);
+
+        String tempSequence = "";
+        try {
+            tempGraph.isConnectivity(2);
+            //tempSequence = tempGraph.breadthFirstTraversal(2);
+        } catch (Exception ee) {
+            System.out.println(ee.getMessage());
+            return;
+        }
+
+        System.out.println("The breadth first order of visit: " + tempGraph.resultString);
+    }
+
     public static void main(String[] args) {
         System.out.println("Hello!");
         Graph tempGraph = new Graph(3);
@@ -101,6 +184,9 @@ public class Graph {
 
         // Unit test.
         getConnectivityTest();
+
+        breadthFirstTraversalTest();
+
     }
 
 
