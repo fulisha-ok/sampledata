@@ -1,7 +1,10 @@
 package graph;
 
 import datastructure.queue.CircleObjectQueue;
+import datastructure.stack.ObjectStack;
 import matrix.IntMatrix;
+
+import java.time.Year;
 
 /**
  * @author： fulisha
@@ -105,7 +108,7 @@ public class Graph {
     public String breadthFirstTraversal(int paraStartIndex) {
         CircleObjectQueue tempQueue = new CircleObjectQueue();
         int tempNumNodes = connectivityMatrix.getRows();
-        tempVisitedArray = new boolean[tempNumNodes];
+
 
         // Initialize the queue
         tempVisitedArray[paraStartIndex] = true;
@@ -144,8 +147,10 @@ public class Graph {
      * @param
      * @return
      */
-    public boolean isConnectivity(int paraStartIndex){
+    public boolean breadthTraversal(int paraStartIndex) {
         int tempNumNodes = connectivityMatrix.getRows();
+        tempVisitedArray = new boolean[tempNumNodes];
+        resultString = "";
         breadthFirstTraversal(paraStartIndex);
 
         for (int i = 0; i < tempNumNodes; i++){
@@ -155,6 +160,98 @@ public class Graph {
             }
         }
         return true;
+    }
+
+
+    public String depthFirstTraversal(int  paraStartIndex) {
+        ObjectStack tempStack = new ObjectStack();
+
+        int tempNumNodes = connectivityMatrix.getRows();
+        tempVisitedArray = new boolean[tempNumNodes];
+
+        tempVisitedArray[paraStartIndex] = true;
+        resultString += paraStartIndex;
+        tempStack.push(new Integer(paraStartIndex));
+        System.out.println("Push " + paraStartIndex);
+        System.out.println("Visited " + resultString);
+
+        int tempIndex = paraStartIndex;
+        int tempNext;
+        Integer tempInteger;
+        while (true) {
+            tempNext = -1;
+            // Find an unvisited neighbor and push
+            for (int i = 0; i < tempNumNodes; i++) {
+                if (tempVisitedArray[i]) {
+                    continue; //Already visited.
+                }
+
+                if (connectivityMatrix.getData()[tempIndex][i] == 0) {
+                    continue; //Not directly connected.
+                }
+
+                tempVisitedArray[i] = true;
+                resultString += i;
+                tempStack.push(new Integer(i));
+                System.out.println("Push " + i);
+                tempNext = i;
+
+                break;
+            }
+
+
+            if (tempNext == -1) {
+                //there is no neighbor node, pop
+                tempInteger = (Integer) tempStack.pop();
+                System.out.println("Pop " + tempInteger);
+                if (tempStack.isEmpty()) {
+                    //No unvisited neighbor。Backtracking to the last one stored in the stack
+                    break;
+                }else {
+                    tempInteger = (Integer) tempStack.pop();
+                    tempIndex = tempInteger.intValue();
+                    tempStack.push(tempInteger);
+                }
+            } else {
+                tempIndex = tempNext;
+            }
+        }
+        return resultString;
+
+    }
+
+    public boolean depthTraversal(int paraStartIndex){
+        int tempNumNodes = connectivityMatrix.getRows();
+        tempVisitedArray = new boolean[tempNumNodes];
+        resultString = "";
+        depthFirstTraversal(paraStartIndex);
+
+        for (int i = 0; i < tempNumNodes; i++){
+            if (!tempVisitedArray[i]){
+                depthFirstTraversal(i);
+                return false;
+            }
+        }
+        return true;
+    }
+    public static void depthFirstTraversalTest() {
+        // Test an undirected graph.
+        //int[][] tempMatrix = { { 0, 1, 1, 0 }, { 1, 0, 0, 1 }, { 1, 0, 0, 0}, { 0, 1, 0, 0} };
+        // int[][] tempMatrix = { { 0, 1, 1, 0 , 0}, { 1, 0, 0, 1, 0 }, { 1, 0, 0, 1, 0}, { 0, 1, 1, 0, 0}, { 0, 0, 0, 0, 0} };
+        int[][] tempMatrix = { { 0, 1, 1, 0 , 0, 0, 0}, { 1, 0, 0, 1, 0, 0, 0 }, { 1, 0, 0, 1, 0, 0, 0}, { 0, 1, 1, 0, 0, 0, 0}, { 0, 0, 0, 0, 0, 1, 1}, { 0, 0, 0, 0, 1, 0, 0}, { 0, 0, 0, 0, 0, 0, 0} };
+
+        Graph tempGraph = new Graph(tempMatrix);
+        System.out.println(tempGraph);
+
+        String tempSequence = "";
+        try {
+            //tempSequence = tempGraph.depthFirstTraversal(0);
+            tempGraph.depthTraversal(0);
+        } catch (Exception ee) {
+            System.out.println(ee);
+        } // Of try.
+
+        System.out.println("The depth first order of visit: " +  tempGraph.resultString);
     }
 
     public static void breadthFirstTraversalTest() {
@@ -167,7 +264,7 @@ public class Graph {
 
         String tempSequence = "";
         try {
-            tempGraph.isConnectivity(2);
+            tempGraph.breadthTraversal(2);
             //tempSequence = tempGraph.breadthFirstTraversal(2);
         } catch (Exception ee) {
             System.out.println(ee.getMessage());
@@ -187,6 +284,7 @@ public class Graph {
 
         breadthFirstTraversalTest();
 
+        depthFirstTraversalTest();
     }
 
 
