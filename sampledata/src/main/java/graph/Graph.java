@@ -5,6 +5,7 @@ import datastructure.stack.ObjectStack;
 import matrix.IntMatrix;
 
 import java.time.Year;
+import java.util.Arrays;
 
 /**
  * @author： fulisha
@@ -274,6 +275,67 @@ public class Graph {
         System.out.println("The breadth first order of visit: " + tempGraph.resultString);
     }
 
+    /**
+     * Coloring. Output all possible schemes.
+     * @param paraNumColors  The number of colors.
+     */
+    public void coloring(int paraNumColors) {
+        int tempNumNodes = connectivityMatrix.getRows();
+        int[] tempColorScheme = new int[tempNumNodes];
+        Arrays.fill(tempColorScheme, -1);
+
+
+        coloring(paraNumColors, 0, tempColorScheme);
+    }
+
+    /**
+     *Coloring. Output all possible schemes.
+     * @param paraNumColors
+     * @param paraCurrentNumNodes
+     * @param paraCurrentColoring
+     */
+    public void coloring(int paraNumColors, int paraCurrentNumNodes, int[] paraCurrentColoring) {
+        // Step 1. Initialize.
+        int tempNumNodes = connectivityMatrix.getRows();
+
+        System.out.println("coloring: paraNumColors = " + paraNumColors + ", paraCurrentNumNodes = " + paraCurrentNumNodes + ", paraCurrentColoring" + Arrays.toString(paraCurrentColoring));
+        // A complete scheme.
+        if (paraCurrentNumNodes >= tempNumNodes) {
+            System.out.println("Find one:" + Arrays.toString(paraCurrentColoring));
+            return;
+        }
+
+        // Try all possible colors.
+        for (int i = 0; i < paraNumColors; i++) {
+            paraCurrentColoring[paraCurrentNumNodes] = i;
+            if (!colorConflict(paraCurrentNumNodes + 1, paraCurrentColoring)) {
+                coloring(paraNumColors, paraCurrentNumNodes + 1, paraCurrentColoring);
+            }
+        }
+    }
+
+    public boolean colorConflict(int paraCurrentNumNodes, int[] paraColoring) {
+        for (int i = 0; i < paraCurrentNumNodes - 1; i++) {
+            // No direct connection.
+            if (connectivityMatrix.getValue(paraCurrentNumNodes - 1, i) == 0) {
+                continue;
+            }
+
+            if (paraColoring[paraCurrentNumNodes - 1] == paraColoring[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void coloringTest() {
+        //int[][] tempMatrix = { { 0, 1, 1, 0 }, { 1, 0, 0, 1 }, { 1, 0, 0, 0 }, { 0, 1, 0, 0 } };
+        int[][] tempMatrix = { { 0, 1, 1}, { 1, 0, 0 }, { 1, 0, 0 }};
+        Graph tempGraph = new Graph(tempMatrix);
+        //tempGraph.coloring(2);
+        tempGraph.coloring(3);
+    }
+
     public static void main(String[] args) {
         System.out.println("Hello!");
         Graph tempGraph = new Graph(3);
@@ -285,6 +347,8 @@ public class Graph {
         breadthFirstTraversalTest();
 
         depthFirstTraversalTest();
+
+        coloringTest();
     }
 
 
