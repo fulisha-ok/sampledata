@@ -196,6 +196,102 @@ public class Net {
         return resultCost;
     }
 
+    /**
+     * Critical path. Net validity checks such as loop check not implemented.
+     * The source should be 0 and the destination should be n-1.
+     */
+    public boolean[] criticalPath(){
+        //One more value to save simple computation.
+        int tempValue;
+
+        //step1. the in-degree of each code
+        int[] tempInDegrees = new int[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (weightMatrix.getValue(i, j) != -1) {
+                    tempInDegrees[j]++;
+                }
+            }
+        }
+        System.out.println("In-degree of nodes: " + Arrays.toString(tempInDegrees));
+
+        //step2 Topology sorting
+        int[] tempEarliestTimeArray = new int[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+            if (tempInDegrees[i] > 0) {
+                continue;
+            }
+            System.out.println("Removing " + i);
+
+            for (int j = 0; j < numNodes; j++) {
+                if (weightMatrix.getValue(i, j) != -1) {
+                    tempValue = tempEarliestTimeArray[i] + weightMatrix.getValue(i, j);
+                    if (tempEarliestTimeArray[j] < tempValue) {
+                        tempEarliestTimeArray[j] = tempValue;
+                    }
+                    tempInDegrees[j]--;
+                }
+            }
+        }
+
+        System.out.println("Earliest start time: " + Arrays.toString(tempEarliestTimeArray));
+
+        //step3.The out-degree of each node.
+        int[] tempOutDegrees = new int[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+            for (int j = 0; j < numNodes; j++) {
+                if (weightMatrix.getValue(i, j) != -1) {
+                    tempOutDegrees[i]++;
+                }
+            }
+        }
+        System.out.println("Out-degree of nodes: " + Arrays.toString(tempOutDegrees));
+
+        //step4. reverse topology sorting
+        int[] tempLatestTimeArray = new int[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+            tempLatestTimeArray[i] = tempEarliestTimeArray[numNodes - 1];
+        }
+
+        for (int i = numNodes -1; i >=0; i--) {
+            // This node cannot be removed.
+            if (tempOutDegrees[i] > 0) {
+                continue;
+            }
+            System.out.println("Removing " + i);
+
+            for (int j = 0; j < numNodes; j++) {
+                if (weightMatrix.getValue(j, i) != -1) {
+                    tempValue = tempLatestTimeArray[i] - weightMatrix.getValue(j, i);
+                    if (tempLatestTimeArray[j] > tempValue) {
+                        tempLatestTimeArray[j] = tempValue;
+                    }
+                    tempOutDegrees[j]--;
+                    System.out.println("The out-degree of " + j + " decreases by 1.");
+                }
+            }
+
+        }
+        System.out.println("Latest start time: " + Arrays.toString(tempLatestTimeArray));
+        boolean[] resultCriticalArray = new boolean[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+            if (tempEarliestTimeArray[i] == tempLatestTimeArray[i]) {
+                resultCriticalArray[i] = true;
+            }
+        }
+
+        System.out.println("Critical array: " + Arrays.toString(resultCriticalArray));
+        System.out.print("Critical nodes: ");
+        for (int i = 0; i < numNodes; i++) {
+            if (resultCriticalArray[i]) {
+                System.out.print(" " + i);
+            }
+        }
+        System.out.println();
+
+        return resultCriticalArray;
+    }
+
     public static void main(String args[]) {
         Net tempNet0 = new Net(3);
         System.out.println(tempNet0);
@@ -213,6 +309,16 @@ public class Net {
                 { MAX_DISTANCE, 7, 5, 15, 0 } };
         Net tempNet2 = new Net(tempMatrix2);
         tempNet2.prim();
+
+        // A directed net without loop is required.
+        // Node cannot reach itself. It is indicated by -1.
+        int[][] tempMatrix3 = { { -1, 3, 2, -1, -1, -1 }, { -1, -1, -1, 2, 3, -1 },
+                { -1, -1, -1, 4, -1, 3 }, { -1, -1, -1, -1, -1, 2 }, { -1, -1, -1, -1, -1, 1 },
+                { -1, -1, -1, -1, -1, -1 } };
+
+        Net tempNet3 = new Net(tempMatrix3);
+        System.out.println("-------critical path");
+        tempNet3.criticalPath();
     }
 
 }
