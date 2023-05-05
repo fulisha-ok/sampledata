@@ -1,6 +1,7 @@
 package datastructure.search;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * @author： fulisha
@@ -40,6 +41,60 @@ public class DataArray {
         for (int i = 0; i < length; i++) {
             data[i] = new DataNode(paraKeyArray[i], paraContentArray[i]);
         }
+    }
+
+    /**
+     *For Hash code only. It is assumed that paraKeyArray.length <= paraLength.
+     * @param paraKeyArray
+     * @param paraContentArray
+     * @param paraLength
+     */
+    public DataArray(int[] paraKeyArray, String[] paraContentArray, int paraLength) {
+        // step1.Initialize
+        length = paraLength;
+        data = new DataNode[length];
+        for (int i = 0; i < length; i++) {
+            data[i] = null;
+        }
+
+        //step2. fill the data
+        int tempPosition;
+        for (int i = 0; i < paraKeyArray.length; i++) {
+            //Hash
+            tempPosition = paraKeyArray[i] % paraLength;
+
+            //Find an empty position
+            while (data[tempPosition] != null) {
+                tempPosition = (tempPosition + 1) % paraLength;
+                System.out.println("Collision, move forward for key " + paraKeyArray[i]);
+            }
+
+            data[tempPosition] = new DataNode(paraKeyArray[i], paraContentArray[i]);
+        }
+    }
+
+    public String hashSearch(int paraKey) {
+        int tempPosition = paraKey % length;
+        while (data[tempPosition] != null) {
+            if (data[tempPosition].key == paraKey) {
+                return data[tempPosition].content;
+            }
+            System.out.println("Not this one for " + paraKey);
+            tempPosition = (tempPosition + 1) % length;
+        }
+        return "null";
+    }
+
+    public static void hashSearchTest() {
+        int[] tempUnsortedKeys = { 16, 33, 38, 69, 57, 95, 86 };
+        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        DataArray tempDataArray = new DataArray(tempUnsortedKeys, tempContents, 19);
+        System.out.println(tempDataArray);
+
+        System.out.println("Search result of 95 is: " + tempDataArray.hashSearch(95));
+        System.out.println("Search result of 38 is: " + tempDataArray.hashSearch(38));
+        System.out.println("Search result of 57 is: " + tempDataArray.hashSearch(57));
+        System.out.println("Search result of 4 is: " + tempDataArray.hashSearch(4));
     }
 
     @Override
@@ -93,7 +148,7 @@ public class DataArray {
 
     public static void binarySearchTest() {
         int[] tempSortedKeys = { 1, 3, 5, 6, 7, 9, 10 };
-        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        String[] tempContents = { "if", "then", "el se", "switch", "case", "for", "while" };
         DataArray tempDataArray = new DataArray(tempSortedKeys, tempContents);
 
         System.out.println(tempDataArray);
@@ -109,6 +164,9 @@ public class DataArray {
 
         System.out.println("\r\n-------binarySearchTest-------");
         binarySearchTest();
+
+        System.out.println("\r\n-------hashSearchTest-------");
+        hashSearchTest();
     }
 
 
