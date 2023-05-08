@@ -234,6 +234,45 @@ public class DataArray {
         System.out.println("Result\r\n" + tempDataArray);
     }
 
+    /**
+     * bubble sort
+     */
+    public void bubbleSort() {
+        boolean tempSwapped;
+        DataNode tempNode;
+        for (int i = length - 1; i > 0; i--) {
+            tempSwapped = false;
+            for (int j = 0; j < i; j++) {
+                if (data[j].key > data[j+1].key) {
+                    tempNode = data[j+1];
+                    data[j+1] = data[j];
+                    data[j] = tempNode;
+
+                    tempSwapped = true;
+                }
+            }
+
+            if (!tempSwapped) {
+                System.out.println("Premature");
+                break;
+            }
+
+            System.out.println("Round " + (length - i));
+            System.out.println(this);
+        }
+    }
+
+    public static void bubbleSortTest() {
+        int[] tempUnsortedKeys = { 1, 3, 6, 10, 7, 5, 9 };
+        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        DataArray tempDataArray = new DataArray(tempUnsortedKeys, tempContents);
+
+        System.out.println(tempDataArray);
+
+        tempDataArray.bubbleSort();
+        System.out.println("Result\r\n" + tempDataArray);
+    }
+
     public static void main(String[] args) {
         System.out.println("\r\n-------sequentialSearchTest-------");
         sequentialSearchTest();
@@ -249,6 +288,9 @@ public class DataArray {
 
         System.out.println("\r\n-------shellSortTest-------");
         shellSortTest();
+
+        System.out.println("\r\n-------bubbleSortTest-------");
+        bubbleSortTest();
     }
 
 
