@@ -273,6 +273,76 @@ public class DataArray {
         System.out.println("Result\r\n" + tempDataArray);
     }
 
+    /**
+     * Quick sort recursively.
+     * @param paraStart The start index.
+     * @param paraEnd The end index
+     */
+    public void quickSortRecursive(int paraStart, int paraEnd) {
+        // nothing to sort
+        if (paraStart >= paraEnd) {
+            return;
+        }
+        int tempPivot = data[paraEnd].key;
+        DataNode tempNodeForSwap;
+
+        int tempLeft = paraStart;
+        int tempRight = paraEnd - 1;
+
+        //find the position for the pivot. at the same time move smaller elements to the left and bigger one to the right
+        while (true) {
+            while ((data[tempLeft].key < tempPivot) && tempLeft < tempRight) {
+                tempLeft++;
+            }
+            while ((data[tempRight].key) > tempPivot && tempLeft < tempRight) {
+                tempRight--;
+            }
+
+            if (tempLeft < tempRight) {
+                //swap
+                System.out.println("Swapping " + tempLeft + " and " + tempRight);
+                tempNodeForSwap = data[tempLeft];
+                data[tempLeft] = data[tempRight];
+                data[tempRight] = tempNodeForSwap;
+            } else {
+                break;
+            }
+        }
+        // Swap
+        if (data[tempLeft].key > tempPivot) {
+            tempNodeForSwap = data[paraEnd];
+            data[paraEnd] = data[tempLeft];
+            data[tempLeft] = tempNodeForSwap;
+        } else {
+            tempLeft++;
+        }
+
+        System.out.print("From " + paraStart + " to " + paraEnd + ": ");
+        System.out.println(this);
+        quickSortRecursive(paraStart, tempLeft - 1);
+        quickSortRecursive(tempLeft + 1, paraEnd);
+    }
+
+    public void quickSort() {
+        quickSortRecursive(0, length-1);
+    }
+
+    /**
+     * Test the method.
+     */
+    public static void quickSortTest() {
+        int[] tempUnsortedKeys = { 1, 3, 12, 10, 5, 7, 9 };
+        //int[] tempUnsortedKeys = { 25, 45, 55, 15, 20, 50 };
+        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        //String[] tempContents = { "if", "then", "else", "switch", "case", "for" };
+        DataArray tempDataArray = new DataArray(tempUnsortedKeys, tempContents);
+
+        System.out.println(tempDataArray);
+
+        tempDataArray.quickSort();
+        System.out.println("Result\r\n" + tempDataArray);
+    }
+
     public static void main(String[] args) {
         System.out.println("\r\n-------sequentialSearchTest-------");
         sequentialSearchTest();
@@ -291,6 +361,9 @@ public class DataArray {
 
         System.out.println("\r\n-------bubbleSortTest-------");
         bubbleSortTest();
+
+        System.out.println("\r\n-------quickSortTest-------");
+        quickSortTest();
     }
 
 
