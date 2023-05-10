@@ -343,6 +343,38 @@ public class DataArray {
         System.out.println("Result\r\n" + tempDataArray);
     }
 
+    public void selectionSort() {
+        DataNode tempNode;
+        int tempIndexForSmallest;
+
+        for (int i = 0; i < length -1; i++) {
+            //initialize
+            tempNode = data[i];
+            tempIndexForSmallest = i;
+            for (int j = i + 1; j < length; j++) {
+                if (data[j].key < tempNode.key) {
+                    tempNode = data[j];
+                    tempIndexForSmallest = j;
+                }
+            }
+
+            // Change the selected one with the current one.
+            data[tempIndexForSmallest] = data[i];
+            data[i] = tempNode;
+        }
+    }
+
+    public static void selectionSortTest() {
+        int[] tempUnsortedKeys = { 5, 3, 6, 10, 7, 1, 9 };
+        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        DataArray tempDataArray = new DataArray(tempUnsortedKeys, tempContents);
+
+        System.out.println(tempDataArray);
+
+        tempDataArray.selectionSort();
+        System.out.println("Result\r\n" + tempDataArray);
+    }
+
     public static void main(String[] args) {
         System.out.println("\r\n-------sequentialSearchTest-------");
         sequentialSearchTest();
@@ -364,6 +396,9 @@ public class DataArray {
 
         System.out.println("\r\n-------quickSortTest-------");
         quickSortTest();
+
+        System.out.println("\r\n-------selectionSortTest-------");
+        selectionSortTest();
     }
 
 
