@@ -375,6 +375,77 @@ public class DataArray {
         System.out.println("Result\r\n" + tempDataArray);
     }
 
+    /**
+     * heap sort. Maybe the most difficult sorting algorithm.
+     */
+    public void heapSort() {
+        DataNode tempNode;
+        //step1 Construct the initial heap
+        for (int i = length/2 -1 ; i >= 0; i--){
+            adjustHeap(i, length);
+        }
+        System.out.println("The initial heap: " + this + "\r\n");
+
+        //step2 swap and reconstruct
+        for (int i = length -1; i > 0; i--) {
+            tempNode = data[0];
+            data[0] = data[i];
+            data[i] = tempNode;
+
+            adjustHeap(0, i);
+            System.out.println("Round " + (length - i) + ": " + this);
+        }
+
+
+
+    }
+
+    /**
+     * Adjust the heap
+     * @param paraStart the start of the index
+     * @param paraLength the length of the adjusted sequence
+     */
+    public void adjustHeap(int paraStart, int paraLength) {
+        DataNode tempNode = data[paraStart];
+        int tempParent = paraStart;
+        int tempKey = data[paraStart].key;
+
+        for (int tempChild = paraStart*2 + 1; tempChild <  paraLength; tempChild = tempChild*2 + 1) {
+            //the right child is bigger
+            if (tempChild + 1 < paraLength) {
+                if (data[tempChild].key < data[tempChild+1].key) {
+                    tempChild++;
+                }
+            }
+
+            System.out.println("The parent position is " + tempParent + " and the child is " + tempChild);
+            if (tempKey < data[tempChild].key) {
+                // the child is bigger
+                data[tempParent] = data[tempChild];
+                System.out.println("Move " + data[tempChild].key + " to position " + tempParent);
+                tempParent = tempChild;
+            } else {
+                break;
+            }
+        }
+
+        data[tempParent] = tempNode;
+        System.out.println("Adjust " + paraStart + " to " + paraLength + ": " + this);
+    }
+
+    public static void heapSortTest() {
+        //int[] tempUnsortedKeys = { 5, 3, 6, 10, 7, 1, 9 };
+        int[] tempUnsortedKeys = { 53, 17, 78, 9, 45, 65, 87, 32};
+        //String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" , "break"};
+        DataArray tempDataArray = new DataArray(tempUnsortedKeys, tempContents);
+
+        System.out.println(tempDataArray);
+
+        tempDataArray.heapSort();
+        System.out.println("Result\r\n" + tempDataArray);
+    }
+
     public static void main(String[] args) {
         System.out.println("\r\n-------sequentialSearchTest-------");
         sequentialSearchTest();
@@ -399,6 +470,9 @@ public class DataArray {
 
         System.out.println("\r\n-------selectionSortTest-------");
         selectionSortTest();
+
+        System.out.println("\r\n-------heapSortTest-------");
+        heapSortTest();
     }
 
 
