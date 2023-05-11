@@ -446,6 +446,124 @@ public class DataArray {
         System.out.println("Result\r\n" + tempDataArray);
     }
 
+    /**
+     * merge sort. Results are stored in the member variable data;
+     */
+    public void mergeSort() {
+        //step1. Allocate space
+        int tempRow; // the current row
+        int tempGroups; // Number of groups
+        int tempActualRow; // only 0 or 1
+        int tempNextRow = 0;
+        int tempGroupNumber;
+        int tempFirstStart, tempSecondStart, tempSecondEnd;
+        int tempFirstIndex, tempSecondIndex;
+        int tempNumCopied;
+        for (int i = 0; i < length; i++) {
+            System.out.println(data[i]);
+        }
+        System.out.println();
+        DataNode[][] tempMatrix = new DataNode[2][length];
+
+        //step2 copy data
+        for (int i = 0; i < length; i++) {
+            tempMatrix[0][i] = data[i];
+        }
+
+        //step3.Merge log n rounds
+        tempRow = -1;
+        //进行几趟归并排序 tempSize:一个小组的大小
+        for (int tempSize = 1; tempSize <= length; tempSize *= 2) {
+            // Reuse the space of the two rows.
+            tempRow++;
+            System.out.println("Current row = " + tempRow);
+            tempActualRow = tempRow % 2;
+            tempNextRow = (tempRow + 1) % 2;
+
+            // 在每趟排序中需要分为几组 乘以2是因为是2路归并
+            tempGroups = length / (tempSize * 2);
+            if (length % (tempSize * 2) != 0) {
+                tempGroups++;
+            }
+            System.out.println("tempSize = " + tempSize + ", numGroups = " + tempGroups);
+
+            //对两两分组进行排序
+            for (tempGroupNumber = 0; tempGroupNumber < tempGroups; tempGroupNumber++) {
+                //两组的起始位置
+                tempFirstStart = tempGroupNumber * tempSize * 2;
+                tempSecondStart = tempGroupNumber * tempSize * 2 + tempSize;
+
+                if (tempSecondStart > length - 1) {
+                    // Copy the first part.
+                    for (int i = tempFirstStart; i < length; i++) {
+                        tempMatrix[tempNextRow][i] = tempMatrix[tempActualRow][i];
+                    }
+                    continue;
+                }
+                //判断第二个分组与第一个是否等长 不等长则需要调整结尾是长度
+                tempSecondEnd = tempGroupNumber * tempSize * 2 + tempSize * 2 - 1;
+                if (tempSecondEnd > length - 1) {
+                    tempSecondEnd = length - 1;
+                }
+
+                System.out
+                        .println("Trying to merge [" + tempFirstStart + ", " + (tempSecondStart - 1)
+                                + "] with [" + tempSecondStart + ", " + tempSecondEnd + "]");
+
+                tempFirstIndex = tempFirstStart;
+                tempSecondIndex = tempSecondStart;
+                tempNumCopied = 0;
+                while ((tempFirstIndex <= tempSecondStart - 1)
+                        && (tempSecondIndex <= tempSecondEnd)) {
+                    if (tempMatrix[tempActualRow][tempFirstIndex].key <= tempMatrix[tempActualRow][tempSecondIndex].key) {
+
+                        tempMatrix[tempNextRow][tempFirstStart + tempNumCopied] = tempMatrix[tempActualRow][tempFirstIndex];
+                        tempFirstIndex++;
+                        System.out.println("copying " + tempMatrix[tempActualRow][tempFirstIndex]);
+                    } else {
+                        tempMatrix[tempNextRow][tempFirstStart
+                                + tempNumCopied] = tempMatrix[tempActualRow][tempSecondIndex];
+                        System.out.println("copying " + tempMatrix[tempActualRow][tempSecondIndex]);
+                        tempSecondIndex++;
+                    }
+                    tempNumCopied++;
+                }
+
+                while (tempFirstIndex <= tempSecondStart - 1) {
+                    tempMatrix[tempNextRow][tempFirstStart + tempNumCopied] = tempMatrix[tempActualRow][tempFirstIndex];
+                    tempFirstIndex++;
+                    tempNumCopied++;
+                } // Of while
+
+                while (tempSecondIndex <= tempSecondEnd) {
+                    tempMatrix[tempNextRow][tempFirstStart + tempNumCopied] = tempMatrix[tempActualRow][tempSecondIndex];
+                    tempSecondIndex++;
+                    tempNumCopied++;
+                }
+            }
+
+            System.out.println("Round " + tempRow);
+            for (int i = 0; i < length; i++) {
+                System.out.print(tempMatrix[tempNextRow][i] + " ");
+            }
+            System.out.println();
+        }
+
+        data = tempMatrix[tempNextRow];
+    }
+
+    public static void mergeSortTest() {
+        int[] tempUnsortedKeys = { 5, 3, 6, 10, 7, 1, 9 };
+        //int[] tempUnsortedKeys = { 50, 39, 66, 98, 77, 14, 28 };
+        String[] tempContents = { "if", "then", "else", "switch", "case", "for", "while" };
+        DataArray tempDataArray = new DataArray(tempUnsortedKeys, tempContents);
+
+        System.out.println(tempDataArray);
+
+        tempDataArray.mergeSort();
+        System.out.println(tempDataArray);
+    }
+
     public static void main(String[] args) {
         System.out.println("\r\n-------sequentialSearchTest-------");
         sequentialSearchTest();
@@ -473,6 +591,9 @@ public class DataArray {
 
         System.out.println("\r\n-------heapSortTest-------");
         heapSortTest();
+
+        System.out.println("\r\n-------mergeSortTest-------");
+        mergeSortTest();
     }
 
 
