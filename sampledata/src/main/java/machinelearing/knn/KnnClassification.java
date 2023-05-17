@@ -6,8 +6,7 @@ import weka.core.Instances;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author： fulisha
@@ -29,6 +28,28 @@ public class KnnClassification {
      * The distance measure
      */
     public int distanceMeasure = EUCLIDEAN;
+
+    /**
+     * simple voting
+     */
+    public static final int VOTE_SIMPLE = 0;
+
+    /**
+     * add index to simple voting(用索引做距离的平替)
+     */
+    public static final int VOTE_DISTANCE_1 = 1;
+
+    /**
+     * add distance to simple voting(actual distance)
+     */
+    public static final int VOTE_DISTANCE_2 = 2;
+
+    /**
+     * The vote measure
+     */
+    public int voteDistance = VOTE_SIMPLE;
+
+
 
     /**
      * a random instance
@@ -60,6 +81,19 @@ public class KnnClassification {
      */
     int[] predictions;
 
+    Map<Integer, double[]> distanceMap = new HashMap<>();
+
+    public void setDistanceMeasure(int distanceMeasure) {
+        this.distanceMeasure = distanceMeasure;
+    }
+
+    public void setNumNeighbors(int numNeighbors) {
+        this.numNeighbors = numNeighbors;
+    }
+
+    public void setVoteDistance(Integer vote) {
+        this.voteDistance = vote;
+    }
     /**
      * the first constructor
      * @param paraFilename The arff filename.
@@ -123,6 +157,39 @@ public class KnnClassification {
         }
     }
 
+    public void splitByIndex(int[] tempIndices, int index) {
+        int tempSize = dataset.numInstances();
+        int tempTrainingSize  = tempSize - 1;
+        testingSet = new int[1];
+        trainingSet = new int[tempTrainingSize];
+        testingSet[0]  = tempIndices[index];
+
+        int j = 0;
+        for (int i = 0; i < tempSize; i++) {
+            if (i == index) {
+                continue;
+            }
+            trainingSet[j++] = tempIndices[i];
+        }
+
+    }
+
+
+    public void TrainingTesting() {
+        int tempSize = dataset.numInstances();
+        int[] tempIndices = getRandomIndices(tempSize);
+        int testingSize = 1;
+
+        trainingSet = new int[tempSize - testingSize];
+        testingSet = new int[testingSize];
+
+        for (int i = 0; i < tempSize - testingSize; i++) {
+            trainingSet[i] = tempIndices[i];
+        }
+
+    }
+
+
     /**
      * Predict for the whole testing set. The results are stored in predictions
      */
@@ -140,7 +207,8 @@ public class KnnClassification {
      */
     public int predict(int paraIndex) {
         int[] tempNeighbors = computeNearests(paraIndex);
-        int resultPrediction = simpleVoting(tempNeighbors);
+        //int resultPrediction = simpleVoting(tempNeighbors);
+        int resultPrediction = weightedVoting(tempNeighbors, voteDistance, distanceMap.get(paraIndex));
 
         return resultPrediction;
     }
@@ -203,6 +271,7 @@ public class KnnClassification {
      */
     public int[] computeNearests(int paraCurrent) {
         int[] resultNearests = new int[numNeighbors];
+        double[] resultDistance = new double[numNeighbors];
         boolean[] tempSelected = new boolean[trainingSet.length];
         double tempMinimalDistance;
         int tempMinimalIndex = 0;
@@ -229,42 +298,14 @@ public class KnnClassification {
             }
 
             resultNearests[i] = trainingSet[tempMinimalIndex];
+            resultDistance[i] = tempDistances[tempMinimalIndex];
             tempSelected[tempMinimalIndex] = true;
         }
-
+        distanceMap.put(paraCurrent, resultDistance);
         System.out.println("The nearest of " + paraCurrent + " are: " + Arrays.toString(resultNearests));
         return resultNearests;
     }
 
-
-    public int[] computeNearstsNew(int paraCurrent) {
-        int[] resultNearests = new int[numNeighbors];
-
-        int[] trainingIndex = new int[trainingSet.length];
-        double[] trainingDistance = new double[trainingSet.length];
-
-        int j;
-        double tempData;
-
-        //在计算距离的同时进行插入排序
-        for (int i = 0; i < trainingSet.length; i++) {
-            trainingDistance[i]  = distance(paraCurrent, trainingSet[i]);
-            tempData = trainingDistance[i];
-            for (j = i-1; j >= 0 && trainingDistance[j] > tempData; j--) {
-                trainingDistance[j+1] = trainingDistance[j];
-                trainingIndex[j+1] = trainingIndex[j];
-            }
-            trainingDistance[j+1] = tempData;
-            trainingIndex[j+1] = i;
-        }
-
-        //获取前面k个邻居
-        for (int i = 0; i < numNeighbors; i++) {
-            resultNearests[i] = trainingSet[trainingIndex[i]];
-        }
-        System.out.println("The nearest of " + paraCurrent + " are: " + Arrays.toString(resultNearests));
-        return resultNearests;
-    }
 
     /**
      * Voting using the instances
@@ -272,7 +313,7 @@ public class KnnClassification {
      * @return The predicted label.
      */
     public int simpleVoting(int[] paraNeighbors) {
-        int[] tempVotes = new int[dataset.numClasses()];
+        int[] tempVotes = new int[dataset.numClasses()]; //对k个邻居，看k个邻居种，那种类型的花最多则返回这个类型的花的索引。
         for (int i = 0; i < paraNeighbors.length; i++) {
             tempVotes[(int) dataset.instance(paraNeighbors[i]).classValue()]++;
         }
@@ -289,11 +330,70 @@ public class KnnClassification {
         return tempMaximalVotingIndex;
     }
 
+    public int weightedVoting(int[] paraNeighbors, Integer weightModel, double[] tempDistances) {
+        int[] tempVotes = new int[dataset.numClasses()];
+        for (int i = 0; i < paraNeighbors.length; i++) {
+            //voting 花类型的索引index
+            int index = (int)dataset.instance(paraNeighbors[i]).classValue();
+            if (weightModel.equals(VOTE_SIMPLE)) {
+                tempVotes[index]++;
+            } else if (weightModel.equals(VOTE_DISTANCE_1)) {
+                // 因为本身paraNeighbors存储的顺序是按从小到大的顺序存储的，我用i做平替
+                tempVotes[index] += 1/(i+1);
+            } else if (weightModel.equals(VOTE_DISTANCE_2)) {
+                // 用具体的距离方式
+                tempVotes[index] += 1/tempDistances[i];
+            }
+        }
+
+        int tempMaximalVotingIndex = 0;
+        int tempMaximalVoting = 0;
+        for (int i = 0; i < dataset.numClasses(); i++) {
+            if (tempVotes[i] > tempMaximalVoting) {
+                tempMaximalVoting = tempVotes[i];
+                tempMaximalVotingIndex = i;
+            }
+        }
+
+        return tempMaximalVotingIndex;
+    }
+
+    /**
+     *  trainingSet = new int[tempTrainingSize];
+     *         testingSet = new int[tempSize - tempTrainingSize];
+     *
+     *         for (int i = 0; i < tempTrainingSize; i++) {
+     *             trainingSet[i] = tempIndices[i];
+     *         }
+     *
+     *         for (int i = 0; i < tempSize - tempTrainingSize; i++) {
+     *             testingSet[i] = tempIndices[tempTrainingSize + i];
+     *         }
+     */
+
+    public void leaveNneOutTesting() {
+        System.out.println("leave-one-out---------------");
+        int tempSize = dataset.numInstances();
+        int[] predicts = new int[tempSize];
+        int[] tempIndices = getRandomIndices(tempSize);
+        for (int i = 0; i < tempSize; i++) {
+            splitByIndex(tempIndices, i);
+            int[] neighbors = computeNearests(i);
+            int resultPrediction = weightedVoting(neighbors, voteDistance, distanceMap.get(i));
+            predicts[i] = resultPrediction;
+        }
+
+        System.out.println("The nearest of " + predicts + " are: " + Arrays.toString(predicts));
+    }
+
     public static void main(String[] args) {
+
         KnnClassification tempClassifier = new KnnClassification("D:/fulisha/iris.arff");
+        tempClassifier.leaveNneOutTesting();
         tempClassifier.splitTrainingTesting(0.8);
         tempClassifier.predict();
         System.out.println("The accuracy of the classifier is: " + tempClassifier.getAccuracy());
+
     }
 
 }
