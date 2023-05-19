@@ -389,7 +389,7 @@ public class KnnClassification {
 
     public static void main(String[] args) {
 
-        KnnClassification tempClassifier = new KnnClassification("C:/Users/王忠云/Desktop/iris.arff");
+        KnnClassification tempClassifier = new KnnClassification("C:/Users/fls/Desktop/iris.arff");
         tempClassifier.leaveOneOutTesting();
 
         tempClassifier.splitTrainingTesting(0.8);
