@@ -1,11 +1,8 @@
 package machinelearing.knn;
 
-import weka.core.Instance;
 import weka.core.Instances;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -47,7 +44,7 @@ public class KnnClassification {
     /**
      * The vote measure
      */
-    public int voteDistance = VOTE_SIMPLE;
+    public int voteDistance = VOTE_DISTANCE_2;
 
 
 
@@ -157,22 +154,6 @@ public class KnnClassification {
         }
     }
 
-    public void splitByIndex(int[] tempIndices, int index) {
-        int tempSize = dataset.numInstances();
-        int tempTrainingSize  = tempSize - 1;
-        testingSet = new int[1];
-        trainingSet = new int[tempTrainingSize];
-        testingSet[0]  = tempIndices[index];
-
-        int j = 0;
-        for (int i = 0; i < tempSize; i++) {
-            if (i == index) {
-                continue;
-            }
-            trainingSet[j++] = tempIndices[i];
-        }
-
-    }
 
 
     public void TrainingTesting() {
@@ -259,7 +240,7 @@ public class KnnClassification {
             if (predictions[i] == dataset.instance(testingSet[i]).classValue()) {
                 tempCorrect++;
             }
-         }
+        }
 
         return tempCorrect / testingSet.length;
     }
@@ -359,37 +340,58 @@ public class KnnClassification {
     }
 
     /**
-     *  trainingSet = new int[tempTrainingSize];
-     *         testingSet = new int[tempSize - tempTrainingSize];
-     *
-     *         for (int i = 0; i < tempTrainingSize; i++) {
-     *             trainingSet[i] = tempIndices[i];
-     *         }
-     *
-     *         for (int i = 0; i < tempSize - tempTrainingSize; i++) {
-     *             testingSet[i] = tempIndices[tempTrainingSize + i];
-     *         }
+     * leave-one-out test
      */
-
-    public void leaveNneOutTesting() {
-        System.out.println("leave-one-out---------------");
+    public void leaveOneOutTesting() {
+        System.out.println("leave one out test ..........................");
         int tempSize = dataset.numInstances();
-        int[] predicts = new int[tempSize];
+        //int[] predicts = new int[tempSize];
         int[] tempIndices = getRandomIndices(tempSize);
+        int tempCorrect = 0;
         for (int i = 0; i < tempSize; i++) {
+            // 分训练集和测试集 （测试集一个.其余为训练集）
             splitByIndex(tempIndices, i);
-            int[] neighbors = computeNearests(i);
-            int resultPrediction = weightedVoting(neighbors, voteDistance, distanceMap.get(i));
-            predicts[i] = resultPrediction;
+            int[] neighbors = computeNearests(tempIndices[i]);
+            int resultPrediction = weightedVoting(neighbors, voteDistance, distanceMap.get(tempIndices[i]));
+            if(resultPrediction == dataset.instance(tempIndices[i]).classValue()){
+                tempCorrect++;
+            } else{
+                System.out.println(tempIndices[i] + " The resultPrediction " + resultPrediction + " and actual result " + dataset.instance(tempIndices[i]).classValue());
+            }
         }
 
-        System.out.println("The nearest of " + predicts + " are: " + Arrays.toString(predicts));
+        System.out.println("The total size " + tempSize + ", after leave-one-test, the correct predict size :" + tempCorrect);
+
+    }
+
+
+    /**
+     * split for leave-one-out test
+     * @param tempIndices the given dataSet
+     * @param index the index
+     */
+    public void splitByIndex(int[] tempIndices, int index) {
+        int tempSize = dataset.numInstances();
+        int tempTrainingSize  = tempSize - 1;
+        testingSet = new int[1];
+        trainingSet = new int[tempTrainingSize];
+        testingSet[0]  = tempIndices[index];
+
+        int j = 0;
+        for (int i = 0; i < tempSize; i++) {
+            if (i == index) {
+                continue;
+            }
+            trainingSet[j++] = tempIndices[i];
+        }
+
     }
 
     public static void main(String[] args) {
 
-        KnnClassification tempClassifier = new KnnClassification("D:/fulisha/iris.arff");
-        tempClassifier.leaveNneOutTesting();
+        KnnClassification tempClassifier = new KnnClassification("C:/Users/王忠云/Desktop/iris.arff");
+        tempClassifier.leaveOneOutTesting();
+
         tempClassifier.splitTrainingTesting(0.8);
         tempClassifier.predict();
         System.out.println("The accuracy of the classifier is: " + tempClassifier.getAccuracy());
@@ -397,3 +399,4 @@ public class KnnClassification {
     }
 
 }
+
