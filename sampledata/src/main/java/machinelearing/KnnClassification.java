@@ -1,4 +1,4 @@
-package machinelearing.knn;
+package machinelearing;
 
 import weka.core.Instances;
 
