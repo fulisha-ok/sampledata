@@ -1,4 +1,4 @@
-package adaboosting;
+package machinelearing.adaboosting;
 
 import common.Common;
 import weka.core.Instance;

@@ -1,4 +1,4 @@
-package adaboosting;
+package machinelearing.adaboosting;
 
 import weka.core.Instance;
 import java.io.FileReader;

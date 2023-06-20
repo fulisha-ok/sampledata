@@ -1,4 +1,4 @@
-package adaboosting;
+package machinelearing.adaboosting;
 
 import java.io.FileReader;
 import java.util.Arrays;
@@ -378,8 +378,8 @@ public class Booster extends Object {
 		SimpleTools.variableTracking = true;
 		// Booster tempBooster = new Booster("src/data/wdbc_norm_ex.arff");
 		// Booster tempBooster = new Booster("src/data/iris.arff", 0.8);
-		//Booster tempBooster = new Booster("D:/sampledata/sampledata/src/data/iris.arff");
-		Booster tempBooster = new Booster("C:/Users/fls/Desktop/iris-easy.arff");
+		Booster tempBooster = new Booster("D:/sampledata/sampledata/src/data/iris.arff");
+		//Booster tempBooster = new Booster("C:/Users/fls/Desktop/iris-easy.arff");
 
 		tempBooster.setStopAfterConverge(true);
 		tempBooster.setNumBaseClassifiers(20);

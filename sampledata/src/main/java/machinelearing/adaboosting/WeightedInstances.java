@@ -1,4 +1,4 @@
-package adaboosting;
+package machinelearing.adaboosting;
 
 import java.io.FileReader;
 import java.util.Arrays;
