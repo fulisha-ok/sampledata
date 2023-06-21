@@ -201,7 +201,7 @@ public class MatrixFactorization {
             // Update user subspace
             double tempValue = 0;
             for (int j = 0; j < rank; j++) {
-                tempValue = 2 * tempResidual * itemSubspace[tempItemId][j];
+                tempValue = 2 * tempResidual * itemSubspace[tempItemId][j]; // 调整梯度的方向
                 userSubspace[tempUserId][j] += alpha * tempValue;
             }
 
