@@ -196,12 +196,13 @@ public class MatrixFactorization {
             int tempItemId = dataset[i].item;
             double tempRate = dataset[i].rating;
 
+            //残差：表示了模型对于给定数据的拟合程度，或者说模型预测与实际观测之间的偏差
             double tempResidual = tempRate - predict(tempUserId, tempItemId); // Residual
 
             // Update user subspace
             double tempValue = 0;
             for (int j = 0; j < rank; j++) {
-                tempValue = 2 * tempResidual * itemSubspace[tempItemId][j]; // 调整梯度的方向
+                tempValue = 2 * tempResidual * itemSubspace[tempItemId][j] ; // 调整梯度的方向
                 userSubspace[tempUserId][j] += alpha * tempValue;
             }
 
