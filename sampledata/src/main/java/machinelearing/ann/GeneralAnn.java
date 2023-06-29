@@ -131,7 +131,6 @@ public abstract class GeneralAnn {
                 resultIndex = i;
             }
         }
-
         return resultIndex;
     }
 

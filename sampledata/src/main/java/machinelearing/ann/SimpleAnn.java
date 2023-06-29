@@ -117,10 +117,10 @@ public class SimpleAnn extends GeneralAnn{
         }
 
         // Step 2. Back-propagation even for l == 0
-        while (l > 0) {
-            l--;
+        while (l > 0) {//相当于是遍历的是隐藏层
+            l--;//进入前一层
             // Layer l, for each node.
-            for (int j = 0; j < layerNumNodes[l]; j++) {
+            for (int j = 0; j < layerNumNodes[l]; j++) { //这一层的结点
                 double z = 0.0;
                 // For each node of the next layer.
                 for (int i = 0; i < layerNumNodes[l + 1]; i++) {
