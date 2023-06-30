@@ -120,7 +120,7 @@ public class SimpleAnn extends GeneralAnn{
         while (l > 0) {//相当于是遍历的是隐藏层
             l--;//进入前一层
             // Layer l, for each node.
-            for (int j = 0; j < layerNumNodes[l]; j++) { //这一层的结点
+            for (int j = 0; j < layerNumNodes[l]; j++) { //当前层的结点(隐藏层)
                 double z = 0.0;
                 // For each node of the next layer.
                 for (int i = 0; i < layerNumNodes[l + 1]; i++) {
@@ -128,12 +128,12 @@ public class SimpleAnn extends GeneralAnn{
                         z += layerNodeErrors[l + 1][i] * edgeWeights[l][j][i];
                     }
 
-                    // Weight adjusting.
+                    // Weight adjusting. 权重调整的增量。调整权重的参数mobp，learningRate
                     edgeWeightsDelta[l][j][i] = mobp * edgeWeightsDelta[l][j][i]
                             + learningRate * layerNodeErrors[l + 1][i] * layerNodeValues[l][j];
                     edgeWeights[l][j][i] += edgeWeightsDelta[l][j][i];
-                    if (j == layerNumNodes[l] - 1) {
-                        // Weight adjusting for the offset part.
+                    if (j == layerNumNodes[l] - 1) { // 如果是这层最后的结点，若是则为偏置结点
+                        // Weight adjusting for the offset part.（偏置节点的权重调整增量）
                         edgeWeightsDelta[l][j + 1][i] = mobp * edgeWeightsDelta[l][j + 1][i]
                                 + learningRate * layerNodeErrors[l + 1][i];
                         edgeWeights[l][j + 1][i] += edgeWeightsDelta[l][j + 1][i];
