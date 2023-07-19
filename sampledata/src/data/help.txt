@@ -1,0 +1,8 @@
+The is the ANN project GUI.
+1. The arff filename is for the data file.
+2. Alpha, beta, and gamma are parameters for the activator.
+3. Layer nodes should be some numbers separated by comma. For example, "4, 8, 8, 3" means that the number of input nodes is 4, the number of output nodes is 3, and the number of two hidden layer nodes are all 8.
+4. Activators are specified by a string, each character for the activator of a layer.
+5. Training rounds: more rounds for more stable results.
+6. Learning rate
+7. Mobp
