@@ -12,53 +12,53 @@ public class CnnLayer {
     LayerTypeEnum type;
 
     /**
-     * The number of out map.
+     * The number of out map.-输出特征图数量
      */
     int outMapNum;
 
     /**
-     * The map size.
+     * The map size. - 特征图尺寸
      */
     Size mapSize;
 
     /**
-     * The kernel size.
+     * The kernel size.-卷积核尺寸
      */
     Size kernelSize;
 
     /**
-     * The scale size.
+     * The scale size.-缩放尺寸
      */
     Size scaleSize;
 
     /**
-     * The index of the class (label) attribute.
+     * The index of the class (label) attribute. -分类数量（当层类型为OUTPUT时使用）
      */
     int classNum = -1;
 
     /**
-     * Kernel. Dimensions: [front map][out map][width][height].
+     * Kernel. Dimensions: [front map][out map][width][height].-卷积核
      */
     private double[][][][] kernel;
 
     /**
-     * Bias. The length is outMapNum.
+     * Bias. The length is outMapNum. - 偏置，长度为输出特征图的数量
      */
     private double[] bias;
 
     /**
      * Out maps. Dimensions:
-     * [batchSize][outMapNum][mapSize.width][mapSize.height].
+     * [batchSize][outMapNum][mapSize.width][mapSize.height]. - 输出特征图，维度：[batch大小][输出特征图数量][特征图宽度][特征图高度]
      */
     private double[][][][] outMaps;
 
     /**
-     * Errors.
+     * Errors. - 误差
      */
     private double[][][][] errors;
 
     /**
-     * For batch processing.
+     * For batch processing. - 用于批处理
      */
     private static int recordInBatch = 0;
 
